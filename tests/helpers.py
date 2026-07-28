@@ -9,7 +9,7 @@ def status_code_with_message(self, response):
         f.write("-" * 160 + "\n")
 
 def is_it_successful(self, response, f):
-    method_name_number = self._testMethodName.rsplit("_", 1)[-1]
+    method_name_number = self._testMethodName.split("_")[-1]
     code = int(method_name_number) if method_name_number.isdecimal() else None
 
     if code == None:

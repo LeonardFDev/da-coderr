@@ -8,8 +8,6 @@ from auth_app.models import Profile
 from tests.helpers import status_code_with_message
 
 class RegistrationTests(APITestCase):
-    open("test_protocol.log", "w").close()
-
     def test_registration_get_405(self):
         url = reverse("registration")
         response = self.client.get(url)

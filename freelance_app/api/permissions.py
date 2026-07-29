@@ -4,25 +4,58 @@ from rest_framework.permissions import BasePermission
 from auth_app.models import Profile
 
 
-class IsOwnerPatch(BasePermission):
+class ProfileDetailPermission(BasePermission):
     def has_permission(self, request, view):
         is_authenticated = request.user.is_authenticated
         return is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        is_owner = self.checkOwner(request, obj)
+        is_owner = self.check_owner(request, obj)
         
         if request.method in ("PATCH"):    
             return is_owner
         return True
     
-    def checkOwner(self, request, profile):
+    def check_owner(self, request, profile):
         request_user = request.user
         profile_user = get_object_or_404(Profile, username = request_user)
         is_owner = profile == profile_user
 
         return is_owner
+
+
+class OfferListPermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in ("POST"):
+            is_authenticated = request.user.is_authenticated
+            return is_authenticated
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in ("POST"):    
+            is_type_business  = self.check_type(request)
+            return is_type_business
+        return True
     
+    def check_type(self, request):
+        request_user = request.user
+        is_profile_business = Profile.objects.filter(username = request_user, type = "business").exists()
+
+        return is_profile_business
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #     def checkMembers(self, request, board):
 #         email = request.user.username
 #         user = get_object_or_404(KanMindUser, email = email)

@@ -15,11 +15,10 @@ class Profile(models.Model):
     file = models.CharField(max_length=100, blank=True, default="")             # <- aktuell wird bei keiner Eingabe "" gesetzt, vielleicht wird das noch auf Null geändert
     location = models.CharField(max_length=100, blank=True, default="")
     tel = models.CharField(max_length=20, blank=True, default="")
-    description = models.CharField(max_length=100, blank=True, default="")
+    description = models.TextField(blank=True, default="")
     working_hours = models.CharField(max_length=100, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     uploaded_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["id"]

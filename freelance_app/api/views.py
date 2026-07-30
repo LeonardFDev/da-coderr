@@ -9,9 +9,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from auth_app.models import Profile
 from freelance_app.models import Offer
-from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, OfferSerializer
+from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
+    OfferCreateSerializer, OfferListSerializer
 from .permissions import ProfileDetailPermission, OfferListPermission
 from .pagination import LargeResultsSetPagination
+from .filters import OfferFilter
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
@@ -33,23 +35,25 @@ class ProfilesCustomerListView(generics.ListAPIView):
 
 class OfferListView(generics.ListCreateAPIView):
     queryset = Offer.objects.all()
-    serializer_class = OfferSerializer
     permission_classes = [OfferListPermission]
     pagination_class = LargeResultsSetPagination
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["author__username"]
-    search_fields = ["content"]
-    ordering_fields = ["content", "author__username"]
-    ordering = ["content"]
+    filterset_fields = ["creator_id", "min_price", "max_delivery_time"]
+    search_fields = ["title", "description"]
+    ordering_fields = ["updated_at", "min_price"]
+    filterset_class = OfferFilter
 
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return OfferCreateSerializer
+        return OfferListSerializer
 
+    def perform_create(self, serializer):
+        request_username = self.request.user.username
+        profile = get_object_or_404(Profile, username = request_username)
 
+        if profile.type != "business":
+            raise PermissionDenied("Only users with the type 'business' are allowed to add an offer.")
 
-
-# creator_id	                     integer	Filtert die Angebote nach dem Benutzer, der sie erstellt hat.
-# min_price	float	                            Filtert Angebote mit einem Mindestpreis.
-# max_delivery_time	                 integer	Filtert Angebote, deren Lieferzeit kürzer oder gleich dem angegebenen Wert ist.
-# ordering	                         string	    Sortiert die Angebote nach den Feldern 'updated_at' oder 'min_price'.
-# search	                         string	    Durchsucht die Felder 'title' und 'description' nach Übereinstimmungen.
-# page_size	                         integer	Gibt an, wie viele Ergebnisse pro Seite zurückgegeben werden sollen. Dies sollte mit dem Frontend abgestimmt sein.
+        serializer.save(user = profile)

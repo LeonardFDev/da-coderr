@@ -20,12 +20,13 @@ class OfferGetTests(APITestCase):
             offerDetail2 = OfferDetail.objects.create(title= f"Standard Design{offer}", revisions= 5, delivery_time_in_days= 7, price= 200, features= [f"Logo Design{offer}", f"Visitenkarte{offer}", f"Briefpapier{offer}"], offer_type= "standard", offer= offer)
             offerDetail3 = OfferDetail.objects.create(title= f"Premium Design{offer}", revisions= 10, delivery_time_in_days= 10, price= 500, features= [f"Logo Design{offer}", f"Visitenkarte{offer}", f"Briefpapier{offer}", f"Flyer{offer}"], offer_type= "premium", offer= offer)
 
-    # def test_offer_list_get_400(self):
-    #     url = reverse("offer-list")
-    #     response = self.client.get(url)
+    def test_offer_list_get_400(self):
+        url = reverse("offer-list")
+        filter_search_ordering = {"creator_id": "a", "min_price": "c", "max_delivery_time": "abc", "page_size": "abc", "search": "django", "ordering": "created_at",}
+        response = self.client.get(url, filter_search_ordering)
     
-    #     status_code_with_message(self, response)
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_offer_list_get_200(self):
         url = reverse("offer-list")
@@ -44,16 +45,263 @@ class OfferPostTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-    def test_offer_list_post_400(self):
-        pass
+    def test_offer_list_offer_type_double_value_post_400(self):
+        url = reverse("offer-list")
+        data = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte"
+                        ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200.99,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        response = self.client.post(url, data, format= "json")
+                
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_offer_list_no_three_details_objects_post_400(self):
+        url = reverse("offer-list")
+        data = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte"
+                        ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200.99,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                }
+            ]
+        }
+        response = self.client.post(url, data, format= "json")
+                
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_offer_list_not_a_valid_choice_post_400(self):
+        url = reverse("offer-list")
+        data = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte"
+                        ],
+                    "offer_type": "basiccccc"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200.99,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        response = self.client.post(url, data, format= "json")
+
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_offer_list_no_values_post_400(self):
+        url = reverse("offer-list")
+        data = {
+
+        }
+        response = self.client.post(url, data, format= "json")
+        
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_offer_list_post_401(self):
-        pass
+        self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
+        
+        url = reverse("offer-list")
+        data = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte"
+                    ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200.99,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        response = self.client.post(url, data, format= "json")
+        
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_offer_list_post_403(self):
-        pass
+        user2 = User.objects.create_user(username="testuser2", password="testpassword", email="testuser2@test.de")
+        profile2 = Profile.objects.create(user= user2, username= user2.username, email = user2.email, type = "customer")
+                
+        token2 = Token.objects.create(user = user2)
+        self.client.credentials(HTTP_AUTHORIZATION= "Token " + token2.key)
+        
+        url = reverse("offer-list")
+        data = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte"
+                    ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200.99,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        response = self.client.post(url, data, format= "json")
+        
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_profile_detail_get_201(self):
+    def test_profile_detail_post_201(self):
         url = reverse("offer-list")
         data = {
             "title": "Grafikdesign-Paket",

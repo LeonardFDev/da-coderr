@@ -22,5 +22,5 @@ class OfferDetail(models.Model):
     delivery_time_in_days = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     features = models.JSONField(default=list)
-    offer_type = models.CharField(max_length=20, choices=OfferType.choices) #, unique=True
+    offer_type = models.CharField(max_length=20, choices=OfferType.choices)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="offer_details")

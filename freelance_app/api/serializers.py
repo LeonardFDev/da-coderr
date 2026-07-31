@@ -74,6 +74,15 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         fields = fields = ["id", "title", "image", "description", "details"]
         read_only_fields = ["user"]
 
+    def validate_details(self, value):
+        if len(value) != 3:
+            raise serializers.ValidationError("Exactly 3 details objects must be specified.")
+        
+        offer_type_values = [offer_detail["offer_type"] for offer_detail in value]
+        if len(offer_type_values) != len(set(offer_type_values)):
+            raise serializers.ValidationError("basic, standard and premium allowed to occur only once and must not appear multiple times.")
+        return value
+
     def get_min_price(self, obj):
         return float(obj.offer_details.aggregate(min_price=Min("price"))["min_price"])
 

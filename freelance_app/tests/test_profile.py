@@ -20,21 +20,21 @@ class ProfileGetTests(APITestCase):
     def test_profile_detail_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
 
-        url = reverse("profile-deatil", kwargs={"pk": self.profile.id})
+        url = reverse("profile-detail", kwargs={"pk": self.profile.id})
         response = self.client.get(url)
 
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_profile_detail_get_404(self):
-        url = reverse("profile-deatil", kwargs={"pk": 999})
+        url = reverse("profile-detail", kwargs={"pk": 999})
         response = self.client.get(url)
     
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_profile_detail_get_200(self):
-        url = reverse("profile-deatil", kwargs={"pk": self.profile.id})
+        url = reverse("profile-detail", kwargs={"pk": self.profile.id})
         response = self.client.get(url)
         
         status_code_with_message(self, response)
@@ -54,7 +54,7 @@ class ProfilePatchTests(APITestCase):
     def test_profile_detail_patch_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
 
-        url = reverse("profile-deatil", kwargs={"pk": self.profile.id})
+        url = reverse("profile-detail", kwargs={"pk": self.profile.id})
         data = {"first_name": "Max",
                 "last_name": "Mustermann",
                 "location": "Berlin",
@@ -74,7 +74,7 @@ class ProfilePatchTests(APITestCase):
         token2 = Token.objects.create(user = user2)
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + token2.key)
         
-        url = reverse("profile-deatil", kwargs={"pk": self.profile.id})
+        url = reverse("profile-detail", kwargs={"pk": self.profile.id})
         data = {"first_name": "Max",
                 "last_name": "Mustermann",
                 "location": "Berlin",
@@ -88,7 +88,7 @@ class ProfilePatchTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_profile_detail_patch_404(self):
-        url = reverse("profile-deatil", kwargs={"pk": 999})
+        url = reverse("profile-detail", kwargs={"pk": 999})
         data = {"first_name": "Max",
                 "last_name": "Mustermann",
                 "location": "Berlin",
@@ -102,7 +102,7 @@ class ProfilePatchTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_profile_detail_patch_200(self):
-        url = reverse("profile-deatil", kwargs={"pk": self.profile.id})
+        url = reverse("profile-detail", kwargs={"pk": self.profile.id})
         data = {"first_name": "Max",
                 "last_name": "Mustermann",
                 "location": "Berlin",

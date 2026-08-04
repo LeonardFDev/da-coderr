@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.db.models import Min
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -31,7 +32,7 @@ class OfferUserDetails(serializers.ModelSerializer):
         fields = ["first_name", "last_name", "username"]
 
 
-class OfferDetailsSerializer(serializers.ModelSerializer):
+class OfferDetailsDetailListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
         exclude = ["offer"]
@@ -49,7 +50,20 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
         return data
 
 
-class OfferDetailsPartPathSerializer(serializers.ModelSerializer):
+class OfferDetailsListCompletePathListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = OfferDetail
+        fields = ["id", "url"]
+
+        extra_kwargs = {
+            "url": {
+                "view_name": "offerdetails-detail",
+                "lookup_field": "id",
+            }
+        }
+
+
+class OfferDetailsListPartPathSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
 
     class Meta:
@@ -57,17 +71,14 @@ class OfferDetailsPartPathSerializer(serializers.ModelSerializer):
         fields = ["id", "url"]
 
     def get_url(self, obj):
-        return f"/offerdetails/{obj.id}/"
-
-
-class OfferDetailsCompletePathListSerializer(serializers.HyperlinkedModelSerializer):  #noch nicht verwändet (ist das mit dem vollständigen Pfad)
-    class Meta:
-        model = OfferDetail
-        fields = ["id", "url"]
+        url = reverse("offerdetails-detail", kwargs={"id": obj.pk})
+        API_PREFIX = "/api"
+        url_without_api = url.replace(API_PREFIX, "", 1)
+        return url_without_api
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
-    details = OfferDetailsSerializer(many=True, source="offer_details")
+    details = OfferDetailsDetailListSerializer(many=True, source="offer_details")
 
     class Meta:
         model = Offer
@@ -100,7 +111,7 @@ class OfferCreateSerializer(serializers.ModelSerializer):
 
 
 class OfferListSerializer(serializers.ModelSerializer):
-    details = OfferDetailsPartPathSerializer(many=True, source="offer_details")
+    details = OfferDetailsListPartPathSerializer(many=True, source="offer_details")
     min_price = serializers.SerializerMethodField()
     min_delivery_time = serializers.SerializerMethodField()
     user_details = OfferUserDetails(source = "user")
@@ -119,3 +130,18 @@ class OfferListSerializer(serializers.ModelSerializer):
     
     def get_min_delivery_time(self, obj):
         return obj.offer_details.aggregate(min_delivery_time=Min("delivery_time_in_days"))["min_delivery_time"]
+
+
+class OfferDetailGetSerializer(OfferListSerializer, serializers.ModelSerializer):
+    details = OfferDetailsListCompletePathListSerializer(many=True, source="offer_details")
+
+    class Meta:
+        model = Offer
+        fields = ["id", "user", "title", "image", "description", "created_at", "updated_at", "details", "min_price", "min_delivery_time", "user_details"]
+
+class OfferDetailSerializer(serializers.ModelSerializer):
+    details = OfferDetailsDetailListSerializer(many=True, source="offer_details")
+
+    class Meta:
+            model = Offer
+            fields = ["id", "title", "image", "description", "details"]

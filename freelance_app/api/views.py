@@ -8,10 +8,11 @@ from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 
 from auth_app.models import Profile
-from freelance_app.models import Offer
+from freelance_app.models import Offer, OfferDetail
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
-    OfferCreateSerializer, OfferListSerializer
-from .permissions import ProfileDetailPermission, OfferListPermission
+    OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsListPartPathSerializer, \
+    OfferDetailSerializer
+from .permissions import ProfilePermission, OfferPermission
 from .pagination import LargeResultsSetPagination
 from .filters import OfferFilter
 
@@ -20,7 +21,7 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     http_method_names = ["get", "patch"]
     serializer_class = ProfileSerializer
-    permission_classes = [ProfileDetailPermission]
+    permission_classes = [ProfilePermission]
 
 
 class ProfilesBusinessListView(generics.ListAPIView):
@@ -35,13 +36,14 @@ class ProfilesCustomerListView(generics.ListAPIView):
 
 class OfferListView(generics.ListCreateAPIView):
     queryset = Offer.objects.all()
-    permission_classes = [OfferListPermission]
+    permission_classes = [OfferPermission]
     pagination_class = LargeResultsSetPagination
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["creator_id", "min_price", "max_delivery_time"]
     search_fields = ["title", "description"]
     ordering_fields = ["updated_at", "min_price"]
+    ordering = ["id"]
     filterset_class = OfferFilter
 
     def get_serializer_class(self):
@@ -57,3 +59,20 @@ class OfferListView(generics.ListCreateAPIView):
             raise PermissionDenied("Only users with the type 'business' are allowed to add an offer.")
 
         serializer.save(user = profile)
+
+
+class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Offer.objects.all()
+    permission_classes = [OfferPermission]
+    lookup_field = "id"
+
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return OfferDetailGetSerializer
+        return OfferDetailSerializer
+
+
+class OfferDetailsDetailView(generics.RetrieveAPIView):
+    queryset = OfferDetail.objects.all()
+    serializer_class = OfferDetailsListPartPathSerializer
+    lookup_field = "id"

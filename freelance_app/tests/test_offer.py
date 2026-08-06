@@ -731,4 +731,4 @@ class offerdetailsDetailGetTests(APITestCase):
         response = self.client.get(url)
             
         status_code_with_message(self, response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)    
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -10,8 +10,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from auth_app.models import Profile
 from freelance_app.models import Offer, OfferDetail
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
-    OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsListPartPathSerializer, \
-    OfferDetailSerializer
+    OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsSerializer, \
+    OfferDetailPatchSerializer
 from .permissions import ProfilePermission, OfferPermission
 from .pagination import LargeResultsSetPagination
 from .filters import OfferFilter
@@ -63,16 +63,17 @@ class OfferListView(generics.ListCreateAPIView):
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Offer.objects.all()
+    http_method_names = ["get", "patch", "delete"]
     permission_classes = [OfferPermission]
     lookup_field = "id"
 
     def get_serializer_class(self):
         if self.request.method == "GET":
             return OfferDetailGetSerializer
-        return OfferDetailSerializer
+        return OfferDetailPatchSerializer
 
 
 class OfferDetailsDetailView(generics.RetrieveAPIView):
     queryset = OfferDetail.objects.all()
-    serializer_class = OfferDetailsListPartPathSerializer
+    serializer_class = OfferDetailsSerializer
     lookup_field = "id"

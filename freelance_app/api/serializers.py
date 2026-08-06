@@ -32,10 +32,11 @@ class OfferUserDetails(serializers.ModelSerializer):
         fields = ["first_name", "last_name", "username"]
 
 
-class OfferDetailsDetailListSerializer(serializers.ModelSerializer):
+class OfferDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
         exclude = ["offer"]
+        read_only_fields = ["id"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -78,7 +79,7 @@ class OfferDetailsListPartPathSerializer(serializers.ModelSerializer):
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
-    details = OfferDetailsDetailListSerializer(many=True, source="offer_details")
+    details = OfferDetailsSerializer(many=True, source="offer_details")
 
     class Meta:
         model = Offer
@@ -137,11 +138,74 @@ class OfferDetailGetSerializer(OfferListSerializer, serializers.ModelSerializer)
 
     class Meta:
         model = Offer
-        fields = ["id", "user", "title", "image", "description", "created_at", "updated_at", "details", "min_price", "min_delivery_time", "user_details"]
+        fields = ["id", "user", "title", "image", "description", "created_at", "updated_at", "details", "min_price", "min_delivery_time"]
 
-class OfferDetailSerializer(serializers.ModelSerializer):
-    details = OfferDetailsDetailListSerializer(many=True, source="offer_details")
+class OfferDetailPatchSerializer(serializers.ModelSerializer):
+    details = OfferDetailsSerializer(many=True, source="offer_details")
 
     class Meta:
-            model = Offer
-            fields = ["id", "title", "image", "description", "details"]
+        model = Offer
+        fields = ["id", "title", "image", "description", "details"]
+        read_only_fields = ["id"]
+
+    def update(self, instance, validated_data):
+        changed_offer_details_data = []
+
+        offer_details_data = validated_data.pop("offer_details", [])
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        self.check_offer_details_data(instance, offer_details_data, changed_offer_details_data)
+
+        for offer_detail_data in changed_offer_details_data:
+            offer_detail_data.save()
+        return instance
+
+    def check_offer_details_data(self, instance, offer_details_data, changed_offer_details_data):
+        self.multiple_offer_type(offer_details_data)
+
+        existing_offer_details = {
+            offer_detail.offer_type: offer_detail
+            for offer_detail in instance.offer_details.all()
+        }
+
+        self.ensure_values_are_present_and_valid(offer_details_data, existing_offer_details, changed_offer_details_data)
+
+    def multiple_offer_type(self, offer_details_data):
+        offer_type_list = [
+            offer_detail_data.get("offer_type")
+            for offer_detail_data in offer_details_data
+        ]
+
+        multiple = {
+            offer_type_single for offer_type_single in offer_type_list
+            if offer_type_list.count(offer_type_single) > 1
+        }
+
+        if multiple:
+            raise serializers.ValidationError({"details": f"multiple offer_type value: {multiple}"})
+
+    def ensure_values_are_present_and_valid(self, offer_details_data, existing_offer_details, changed_offer_details_data):
+        for offer_detail_data in offer_details_data:
+            offer_type_value = offer_detail_data.get("offer_type")
+            self.no_offer_type_values(offer_type_value)
+            offer_detail = existing_offer_details.get(offer_type_value)
+            self.offer_type_does_not_exist(offer_detail, offer_type_value)
+            offer_detail_data.pop("offer_type", None)
+
+            for attr, value in offer_detail_data.items():
+                setattr(offer_detail, attr, value)
+            changed_offer_details_data.append(offer_detail)
+
+    def no_offer_type_values(self, offer_type_value):
+        if not offer_type_value:
+            raise serializers.ValidationError(
+                {"details": "offer_type is needed in every single detail"}
+            )
+
+    def offer_type_does_not_exist(self, offer_detail, offer_type_value):
+        if offer_detail is None:
+            raise serializers.ValidationError({"details": f"the offer_type '{offer_type_value}' doesn't exist."})
+    

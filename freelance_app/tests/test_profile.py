@@ -46,7 +46,6 @@ class ProfilePatchTests(APITestCase):
         self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
         self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "customer")
 
-
         self.token = Token.objects.create(user = self.user)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)

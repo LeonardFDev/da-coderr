@@ -1,17 +1,14 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rest_framework import generics, filters
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, PermissionDenied
-from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 
 from auth_app.models import Profile
-from freelance_app.models import Offer, OfferDetail
+from freelance_app.models import Offer, OfferDetail, Order
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
     OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsSerializer, \
-    OfferDetailPatchSerializer
+    OfferDetailPatchSerializer, OrderListSerializer
 from .permissions import ProfilePermission, OfferPermission
 from .pagination import LargeResultsSetPagination
 from .filters import OfferFilter
@@ -77,3 +74,27 @@ class OfferDetailsDetailView(generics.RetrieveAPIView):
     queryset = OfferDetail.objects.all()
     serializer_class = OfferDetailsSerializer
     lookup_field = "id"
+
+class OrderListView(generics.ListCreateAPIView):
+    serializer_class = OrderListSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        request_username = self.request.user.username
+        profile = get_object_or_404(Profile, username = request_username)
+
+        return (Order.objects
+            .select_related("offer", "offer_detail")
+            .filter(Q(customer_user=profile.id) | Q(business_user=profile.id)))
+
+    def perform_create(self, serializer):
+        request_username = self.request.user.username
+        profile = get_object_or_404(Profile, username = request_username)
+        offer_detail_id = serializer.validated_data["offer_detail_id"]
+
+        offer_detail = OfferDetail.objects.get(id=offer_detail_id)
+
+        if profile.type != "customer":
+            raise PermissionDenied("Only users with the type \"customer\" are allowed to add an order.")
+
+        serializer.save(customer_user = profile, offer_detail = offer_detail, offer = offer_detail.offer)

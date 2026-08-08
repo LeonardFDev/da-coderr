@@ -1,11 +1,10 @@
 from django.urls import reverse
 from django.db.models import Min
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.exceptions import NotFound
 
 from auth_app.models import Profile
-from freelance_app.models import Offer, OfferDetail
+from freelance_app.models import Offer, OfferDetail, Order
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -140,6 +139,7 @@ class OfferDetailGetSerializer(OfferListSerializer, serializers.ModelSerializer)
         model = Offer
         fields = ["id", "user", "title", "image", "description", "created_at", "updated_at", "details", "min_price", "min_delivery_time"]
 
+
 class OfferDetailPatchSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True, source="offer_details")
 
@@ -208,4 +208,34 @@ class OfferDetailPatchSerializer(serializers.ModelSerializer):
     def offer_type_does_not_exist(self, offer_detail, offer_type_value):
         if offer_detail is None:
             raise serializers.ValidationError({"details": f"the offer_type '{offer_type_value}' doesn't exist."})
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    offer_detail_id = serializers.IntegerField(write_only=True)
+    customer_user = serializers.PrimaryKeyRelatedField(read_only=True)
+    business_user = serializers.PrimaryKeyRelatedField(source="offer_detail.offer.user", read_only=True)
+    title = serializers.CharField(source="offer_detail.title", read_only=True)
+    revisions = serializers.CharField(source="offer_detail.revisions", read_only=True)
+    delivery_time_in_days = serializers.CharField(source="offer_detail.delivery_time_in_days", read_only=True)
+    price = serializers.CharField(source="offer_detail.price", read_only=True)
+    features = serializers.JSONField(source="offer_detail.features", read_only=True)
+    offer_type = serializers.CharField(source="offer_detail.offer_type", read_only=True)
+    created_at = serializers.CharField(source="offer_detail.offer.created_at", read_only=True)
+    updated_at = serializers.CharField(source="offer_detail.offer.updated_at", read_only=True)
+    status = serializers.CharField(read_only=True)
     
+    class Meta:
+        model = Order
+        fields = ["offer_detail_id", "id", "customer_user", "business_user", "title", "revisions", "delivery_time_in_days", "price", "features", "offer_type", "status", "created_at", "updated_at"]
+        read_only_fields = ["id", "customer_user", "business_user", "title", "revisions", "delivery_time_in_days", "price", "features", "offer_type", "created_at", "updated_at", "status"]
+
+
+    def validate_offer_detail_id(self, id):
+        try:
+            OfferDetail.objects.get(id=id)
+        except OfferDetail.DoesNotExist:
+            raise NotFound(
+                f"Invalid pk \"{id}\" - object does not exist."
+            )
+
+        return id

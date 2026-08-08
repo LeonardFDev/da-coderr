@@ -24,3 +24,19 @@ class OfferDetail(models.Model):
     features = models.JSONField(default=list)
     offer_type = models.CharField(max_length=20, choices=OfferType.choices)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="offer_details")
+
+
+class Order(models.Model):
+   class Status(models.TextChoices):
+        OPEN = "open", "Open"
+        CONFIRMED = "confirmed", "Confirmed"
+        CANCELLED = "cancelled", "Cancelled"
+        REJECTED = "rejected", "Rejected"
+        IN_PROGRESS = "in_progress", "In Progress"
+        COMPLETED = "completed" ,"Completed"
+
+   customer_user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="customer_user_orders")
+   business_user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="business_user_orders")
+   offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, related_name="offer_orders")
+   offer_detail = models.ForeignKey(OfferDetail, on_delete=models.SET_NULL, null=True, related_name="offer_detail_orders")
+   status = models.CharField(max_length=20, choices=Status.choices, default="in_progress")

@@ -28,10 +28,7 @@ class OfferDetail(models.Model):
 
 class Order(models.Model):
    class Status(models.TextChoices):
-        OPEN = "open", "Open"
-        CONFIRMED = "confirmed", "Confirmed"
         CANCELLED = "cancelled", "Cancelled"
-        REJECTED = "rejected", "Rejected"
         IN_PROGRESS = "in_progress", "In Progress"
         COMPLETED = "completed" ,"Completed"
 

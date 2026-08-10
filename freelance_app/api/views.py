@@ -8,8 +8,8 @@ from auth_app.models import Profile
 from freelance_app.models import Offer, OfferDetail, Order
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
     OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsSerializer, \
-    OfferDetailPatchSerializer, OrderListSerializer
-from .permissions import ProfilePermission, OfferPermission
+    OfferDetailPatchSerializer, OrderListSerializer, OrderDetailSerializer
+from .permissions import ProfilePermission, OfferPermission, OrderPermission
 from .pagination import LargeResultsSetPagination
 from .filters import OfferFilter
 
@@ -77,7 +77,6 @@ class OfferDetailsDetailView(generics.RetrieveAPIView):
 
 class OrderListView(generics.ListCreateAPIView):
     serializer_class = OrderListSerializer
-    lookup_field = "id"
 
     def get_queryset(self):
         request_username = self.request.user.username
@@ -98,3 +97,10 @@ class OrderListView(generics.ListCreateAPIView):
             raise PermissionDenied("Only users with the type \"customer\" are allowed to add an order.")
 
         serializer.save(customer_user = profile, offer_detail = offer_detail, offer = offer_detail.offer)
+
+class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderDetailSerializer
+    http_method_names = ["patch", "delete"]
+    permission_classes = [OrderPermission]
+    lookup_field = "id"

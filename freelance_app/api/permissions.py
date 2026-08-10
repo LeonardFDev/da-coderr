@@ -53,4 +53,34 @@ class OfferPermission(BasePermission):
         is_owner = obj.user == profile_user
     
         return is_owner
+
+class OrderPermission(BasePermission):
+    def has_permission(self, request, view):
+        is_authenticated = request.user.is_authenticated
+        if request.method == "DELETE":
+            return request.user.is_staff
+        return is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in ("POST"):    
+            is_type_business  = self.check_type(request)
+            return is_type_business
+
+        if request.method in ("PATCH"):
+            is_owner = self.check_owner(request, obj)
+            is_type_business  = self.check_type(request)
+            return is_owner and is_type_business
+        return True
     
+    def check_type(self, request):
+        request_user = request.user
+        is_profile_business = Profile.objects.filter(username = request_user, type = "business").exists()
+
+        return is_profile_business
+
+    def check_owner(self, request, obj):
+        request_user = request.user
+        profile_user = get_object_or_404(Profile, username = request_user)
+        is_owner = obj.business_user == profile_user
+    
+        return is_owner

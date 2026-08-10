@@ -12,10 +12,10 @@ from .datas import data_offer as OfferData
 
 class OfferListGetTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
-        self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "customer", first_name= "Test", last_name="name")
+        self.user_customer = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "customer", first_name= "Test", last_name="name")
 
-        OfferData.create_offer_objects(self, Offer, OfferDetail, 12)
+        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 12)
         
     def test_offer_list_get_400(self):
         url = reverse("offer-list")
@@ -35,10 +35,10 @@ class OfferListGetTests(APITestCase):
 
 class OfferListPostTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
-        self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "business", first_name= "Test", last_name="name")
+        self.user_customer = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "business", first_name= "Test", last_name="name")
 
-        self.token = Token.objects.create(user = self.user)
+        self.token = Token.objects.create(user = self.user_customer)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
@@ -110,14 +110,14 @@ class OfferListPostTests(APITestCase):
 
 class OfferDetailGetTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
-        self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "business", first_name= "Test", last_name="name")
+        self.user_customer = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "business", first_name= "Test", last_name="name")
     
-        self.token = Token.objects.create(user = self.user)
+        self.token = Token.objects.create(user = self.user_customer)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self, Offer, OfferDetail, 3)
+        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 3)
         
         self.offer = Offer.objects.all()[1]
         
@@ -147,14 +147,14 @@ class OfferDetailGetTests(APITestCase):
 
 class OfferDetailPatchTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
-        self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "business", first_name= "Test", last_name="name")
+        self.user_customer = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "business", first_name= "Test", last_name="name")
     
-        self.token = Token.objects.create(user = self.user)
+        self.token = Token.objects.create(user = self.user_customer)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self, Offer, OfferDetail, 4)
+        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 4)
         
         self.offer = Offer.objects.all()[2]
 
@@ -234,14 +234,14 @@ class OfferDetailPatchTests(APITestCase):
 
 class OfferDetailDeleteTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
-        self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "business", first_name= "Test", last_name="name")
+        self.user_customer = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "business", first_name= "Test", last_name="name")
     
-        self.token = Token.objects.create(user = self.user)
+        self.token = Token.objects.create(user = self.user_customer)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self, Offer, OfferDetail, 3)
+        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 3)
         
         self.offer = Offer.objects.all()[1]
         
@@ -284,14 +284,14 @@ class OfferDetailDeleteTests(APITestCase):
 
 class offerdetailsDetailGetTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
-        self.profile = Profile.objects.create(user= self.user, username= self.user.username, email = self.user.email, type = "business", first_name= "Test", last_name="name")
+        self.user_customer = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "business", first_name= "Test", last_name="name")
     
-        self.token = Token.objects.create(user = self.user)
+        self.token = Token.objects.create(user = self.user_customer)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self, Offer, OfferDetail, 3)
+        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 3)
         
         self.offer = Offer.objects.all()[1]
         self.offer_detail_basic = OfferDetail.objects.all()[3]

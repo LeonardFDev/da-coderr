@@ -212,7 +212,6 @@ class OfferDetailPatchSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(serializers.ModelSerializer):
     offer_detail_id = serializers.IntegerField(write_only=True)
-    customer_user = serializers.PrimaryKeyRelatedField(read_only=True)
     business_user = serializers.PrimaryKeyRelatedField(source="offer_detail.offer.user", read_only=True)
     title = serializers.CharField(source="offer_detail.title", read_only=True)
     revisions = serializers.CharField(source="offer_detail.revisions", read_only=True)
@@ -220,14 +219,17 @@ class OrderListSerializer(serializers.ModelSerializer):
     price = serializers.CharField(source="offer_detail.price", read_only=True)
     features = serializers.JSONField(source="offer_detail.features", read_only=True)
     offer_type = serializers.CharField(source="offer_detail.offer_type", read_only=True)
-    created_at = serializers.CharField(source="offer_detail.offer.created_at", read_only=True)
-    updated_at = serializers.CharField(source="offer_detail.offer.updated_at", read_only=True)
-    status = serializers.CharField(read_only=True)
     
     class Meta:
         model = Order
-        fields = ["offer_detail_id", "id", "customer_user", "business_user", "title", "revisions", "delivery_time_in_days", "price", "features", "offer_type", "status", "created_at", "updated_at"]
-        read_only_fields = ["id", "customer_user", "business_user", "title", "revisions", "delivery_time_in_days", "price", "features", "offer_type", "created_at", "updated_at", "status"]
+        fields = [
+            "offer_detail_id", "id", "customer_user", "business_user", "title", 
+            "revisions", "delivery_time_in_days", "price", "features", "offer_type", 
+            "status", "created_at", "updated_at"]
+        read_only_fields = [
+            "id", "customer_user", "business_user", "title", 
+            "revisions", "delivery_time_in_days", "price", "features", 
+            "offer_type", "created_at", "updated_at", "status"]
 
 
     def validate_offer_detail_id(self, id):

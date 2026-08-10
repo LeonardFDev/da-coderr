@@ -8,7 +8,8 @@ from auth_app.models import Profile
 from freelance_app.models import Offer, OfferDetail, Order
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
     OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsSerializer, \
-    OfferDetailPatchSerializer, OrderListSerializer, OrderDetailSerializer
+    OfferDetailPatchSerializer, OrderListSerializer, OrderDetailSerializer, OrderCountSerializer, \
+    OrderCompletedCountSerializer
 from .permissions import ProfilePermission, OfferPermission, OrderPermission
 from .pagination import LargeResultsSetPagination
 from .filters import OfferFilter
@@ -75,6 +76,7 @@ class OfferDetailsDetailView(generics.RetrieveAPIView):
     serializer_class = OfferDetailsSerializer
     lookup_field = "id"
 
+
 class OrderListView(generics.ListCreateAPIView):
     serializer_class = OrderListSerializer
 
@@ -98,9 +100,22 @@ class OrderListView(generics.ListCreateAPIView):
 
         serializer.save(customer_user = profile, offer_detail = offer_detail, offer = offer_detail.offer)
 
+
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderDetailSerializer
     http_method_names = ["patch", "delete"]
     permission_classes = [OrderPermission]
     lookup_field = "id"
+
+
+class OrderCountView(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = OrderCountSerializer
+    lookup_url_kwarg = "business_user_id"
+
+
+class OrderCompletedCountView(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = OrderCompletedCountSerializer
+    lookup_url_kwarg = "business_user_id"

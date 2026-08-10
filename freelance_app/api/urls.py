@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .views import ProfileDetailView, ProfilesBusinessListView, ProfilesCustomerListView,\
-    OfferListView, OfferDetailView, OfferDetailsDetailView, OrderListView, OrderDetailView
+    OfferListView, OfferDetailView, OfferDetailsDetailView, OrderListView, OrderDetailView, \
+    OrderCountView, OrderCompletedCountView
 
 urlpatterns = [
     path("profile/<int:pk>/", ProfileDetailView.as_view(), name = "profile-detail"),
@@ -12,9 +13,11 @@ urlpatterns = [
     path("offers/<int:id>/", OfferDetailView.as_view(), name = "offer-detail"),
     path("offerdetails/<int:id>/", OfferDetailsDetailView.as_view(), name = "offerdetails-detail"),
 
-    path("api/orders/", OrderListView.as_view(), name ="order-list"),
-    path("api/orders/<int:id>/", OrderDetailView.as_view(), name ="order-detail"),
-    # path("api/order-count/<int:business_user_id>/", .as_view(), name ="order-count-list"),
-    # path("api/completed-order-count/<int:business_user_id>/", .as_view(), name ="completed-order-count-list"),
+    path("orders/", OrderListView.as_view(), name ="order-list"),
+    path("orders/<int:id>/", OrderDetailView.as_view(), name ="order-detail"),
+    path("order-count/<int:business_user_id>/", OrderCountView.as_view(), name ="order-count-detail"),
+    path("completed-order-count/<int:business_user_id>/", OrderCompletedCountView.as_view(), name ="completed-order-count-detail"),
+
+    
 ]
 

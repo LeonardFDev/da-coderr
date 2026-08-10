@@ -231,7 +231,6 @@ class OrderListSerializer(serializers.ModelSerializer):
             "revisions", "delivery_time_in_days", "price", "features", 
             "offer_type", "created_at", "updated_at", "status"]
 
-
     def validate_offer_detail_id(self, id):
         try:
             OfferDetail.objects.get(id=id)
@@ -261,3 +260,25 @@ class OrderDetailSerializer(OrderListSerializer, serializers.ModelSerializer):
                 "status": "This field is required."
             })
         return attrs
+
+
+class OrderCountSerializer(serializers.ModelSerializer):
+    order_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = ["order_count"]
+
+    def get_order_count(self, obj):
+        return obj.business_user_orders.filter(status = "in_progress").count()
+
+
+class OrderCompletedCountSerializer(serializers.ModelSerializer):
+    completed_order_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = ["completed_order_count"]
+
+    def get_completed_order_count(self, obj):
+        return obj.business_user_orders.filter(status = "completed").count()

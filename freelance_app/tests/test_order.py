@@ -23,7 +23,7 @@ class OrderListGetTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 4)
+        OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
         OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
 
     def test_offer_list_get_401(self):
@@ -78,7 +78,7 @@ class OrderListPostTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 4)
+        OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
 
     def test_order_list_incorrect_type_post_400(self):
         url = reverse("order-list")
@@ -149,7 +149,7 @@ class OrderDetailPatchTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 4)
+        OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
         OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
         self.order = Order.objects.all()[2]
 
@@ -224,7 +224,7 @@ class OrderDetailDeleteTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token_admin.key)
 
-        OfferData.create_offer_objects(self.profile_customer, Offer, OfferDetail, 4)
+        OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
         OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
         self.order = Order.objects.all()[2]
         
@@ -263,3 +263,81 @@ class OrderDetailDeleteTests(APITestCase):
             
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class OrderCountDetailGetTests(APITestCase):
+    def setUp(self):
+        self.user_business = User.objects.create_user(username="testuser_business", password="testpassword", email="testuser_business@test.de")
+        self.profile_business = Profile.objects.create(user= self.user_business, username= self.user_business.username, email = self.user_business.email, type = "business", first_name= "Test", last_name="name")
+
+        self.user_customer = User.objects.create_user(username="testuser-customer", password="testpassword", email="testuser_customer@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "customer", first_name= "Test", last_name="name")
+
+        self.token = Token.objects.create(user = self.user_business)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
+
+        OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
+        OrderData.create_order_selected_status_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+
+    def test_order_count_detail_get_401(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
+
+        url = reverse("order-count-detail", kwargs={"business_user_id": self.profile_business.id}) 
+        response = self.client.get(url)
+                    
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_order_count_detail_get_404(self):
+        url = reverse("order-count-detail", kwargs={"business_user_id": 999})
+        response = self.client.get(url)
+                        
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_order_count_detail_get_200(self):
+        url = reverse("order-count-detail", kwargs={"business_user_id": self.profile_business.id})
+        response = self.client.get(url)
+            
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class CompletedOrderCountDetailGetTests(APITestCase):
+    def setUp(self):
+        self.user_business = User.objects.create_user(username="testuser_business", password="testpassword", email="testuser_business@test.de")
+        self.profile_business = Profile.objects.create(user= self.user_business, username= self.user_business.username, email = self.user_business.email, type = "business", first_name= "Test", last_name="name")
+
+        self.user_customer = User.objects.create_user(username="testuser-customer", password="testpassword", email="testuser_customer@test.de")
+        self.profile_customer = Profile.objects.create(user= self.user_customer, username= self.user_customer.username, email = self.user_customer.email, type = "customer", first_name= "Test", last_name="name")
+
+        self.token = Token.objects.create(user = self.user_business)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
+
+        OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
+        OrderData.create_order_selected_status_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+
+    def test_completed_order_count_detail_get_401(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
+
+        url = reverse("completed-order-count-detail", kwargs={"business_user_id": self.profile_business.id}) 
+        response = self.client.get(url)
+                    
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_completed_order_count_detail_get_404(self):
+        url = reverse("completed-order-count-detail", kwargs={"business_user_id": 999})
+        response = self.client.get(url)
+                        
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_completed_order_count_detail_get_200(self):
+        url = reverse("completed-order-count-detail", kwargs={"business_user_id": self.profile_business.id})
+        response = self.client.get(url)
+            
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

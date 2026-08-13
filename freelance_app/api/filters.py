@@ -1,10 +1,10 @@
 import django_filters
-from freelance_app.models import Offer
+from freelance_app.models import Offer, Review
 
 
 class OfferFilter(django_filters.FilterSet):
     creator_id = django_filters.NumberFilter(
-        field_name="user",
+        field_name="user_id",
         lookup_expr="exact"
     )
 
@@ -20,4 +20,20 @@ class OfferFilter(django_filters.FilterSet):
 
     class Meta:
         model = Offer
+        fields = []
+
+
+class ReviewFilter(django_filters.FilterSet):
+    business_user_id = django_filters.NumberFilter(
+        field_name="business_user_id",
+        lookup_expr="exact",
+    )
+
+    reviewer_id = django_filters.NumberFilter(
+        field_name="reviewer_id",
+        lookup_expr="exact",
+    )
+
+    class Meta:
+        model = Review
         fields = []

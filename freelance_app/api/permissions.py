@@ -84,3 +84,23 @@ class OrderPermission(BasePermission):
         is_owner = obj.business_user == profile_user
     
         return is_owner
+
+
+class ReviewPermission(BasePermission):
+    def has_permission(self, request, view):
+        is_authenticated = request.user.is_authenticated
+        return is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        is_customer = self.check_customer(request, obj)
+        
+        if request.method in ("POST"):    
+            return is_customer
+        return True
+    
+    def check_customer(self, request, profile):
+        request_user = request.user
+        profile_user = get_object_or_404(Profile, username = request_user)
+        is_customer = profile.type == "customer"
+
+        return is_customer

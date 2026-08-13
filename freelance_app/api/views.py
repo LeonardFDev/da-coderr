@@ -1,18 +1,19 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rest_framework import generics, filters
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 
 from auth_app.models import Profile
-from freelance_app.models import Offer, OfferDetail, Order
+from freelance_app.models import Offer, OfferDetail, Order, Review
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
     OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsSerializer, \
     OfferDetailPatchSerializer, OrderListSerializer, OrderDetailSerializer, OrderCountSerializer, \
-    OrderCompletedCountSerializer
-from .permissions import ProfilePermission, OfferPermission, OrderPermission
+    OrderCompletedCountSerializer, ReviewSerializer
+from .permissions import ProfilePermission, OfferPermission, OrderPermission, ReviewPermission
 from .pagination import LargeResultsSetPagination
-from .filters import OfferFilter
+from .filters import OfferFilter, ReviewFilter
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
@@ -38,11 +39,11 @@ class OfferListView(generics.ListCreateAPIView):
     pagination_class = LargeResultsSetPagination
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = OfferFilter
     filterset_fields = ["creator_id", "min_price", "max_delivery_time"]
     search_fields = ["title", "description"]
     ordering_fields = ["updated_at", "min_price"]
     ordering = ["id"]
-    filterset_class = OfferFilter
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -119,3 +120,21 @@ class OrderCompletedCountView(generics.RetrieveAPIView):
     queryset = Profile.objects.all()
     serializer_class = OrderCompletedCountSerializer
     lookup_url_kwarg = "business_user_id"
+
+
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [ReviewPermission]
+    http_method_names = ["get", "post", "patch", "delete"]
+
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = ReviewFilter
+    filterset_fields = ["business_user_id", "reviewer_id"]
+    ordering_fields = ["updated_at", "rating"]
+    ordering = ["id"]
+
+    def perform_create(self, serializer):
+        request_username = self.request.user.username
+        profile = get_object_or_404(Profile, username = request_username)
+        serializer.save(reviewer=profile)

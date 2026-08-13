@@ -1,10 +1,11 @@
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.db.models import Min
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 
 from auth_app.models import Profile
-from freelance_app.models import Offer, OfferDetail, Order
+from freelance_app.models import Offer, OfferDetail, Order, Review
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -282,3 +283,23 @@ class OrderCompletedCountSerializer(serializers.ModelSerializer):
 
     def get_completed_order_count(self, obj):
         return obj.business_user_orders.filter(status = "completed").count()
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "business_user", "reviewer", "rating", "description", "created_at", "updated_at"]
+
+    def validate_business_user(self, business_user):
+        request_username = self.context["request"].user.username
+        reviewer = get_object_or_404(Profile, username = request_username)
+
+        if Review.objects.filter(
+            business_user=business_user,
+            reviewer=reviewer,
+        ).exists():
+            raise serializers.ValidationError(
+                "You have already rated this User."
+            )
+
+        return business_user

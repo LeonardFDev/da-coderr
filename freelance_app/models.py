@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from auth_app.models import Profile
 
@@ -39,3 +40,20 @@ class Order(models.Model):
    status = models.CharField(max_length=20, choices=Status.choices, default="in_progress")
    created_at = models.DateTimeField(auto_now_add=True)
    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Review(models.Model):
+    business_user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name="business_user_reviews")
+    reviewer = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name="reviewer_reviews")
+    rating = models.FloatField(validators=[MinValueValidator(1.0), MaxValueValidator(5.0)])
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["business_user", "reviewer"],
+                name="unique_review_per_reviewer_business_user",
+            )
+        ]

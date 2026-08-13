@@ -24,7 +24,7 @@ class OrderListGetTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
         OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
-        OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+        OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, 4)
 
     def test_offer_list_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
@@ -150,7 +150,7 @@ class OrderDetailPatchTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
         OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
-        OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+        OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, 4)
         self.order = Order.objects.all()[2]
 
     def test_order_detail_incorrect_not_a_valid_choice_post_400(self):
@@ -225,7 +225,7 @@ class OrderDetailDeleteTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token_admin.key)
 
         OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
-        OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+        OrderData.create_order_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, 4)
         self.order = Order.objects.all()[2]
         
     def test_offer_detail_delete_401(self):
@@ -278,7 +278,7 @@ class OrderCountDetailGetTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
         OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
-        OrderData.create_order_selected_status_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+        OrderData.create_order_selected_status_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, 4)
 
     def test_order_count_detail_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
@@ -317,7 +317,7 @@ class CompletedOrderCountDetailGetTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
         OfferData.create_offer_objects(self.profile_business, Offer, OfferDetail, 4)
-        OrderData.create_order_selected_status_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, range_stop = 4)
+        OrderData.create_order_selected_status_objects(self.profile_business, self.profile_customer, Offer, OfferDetail, Order, 4)
 
     def test_completed_order_count_detail_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")

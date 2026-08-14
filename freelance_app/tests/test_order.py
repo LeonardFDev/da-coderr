@@ -120,7 +120,7 @@ class OrderListPostTests(APITestCase):
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_offer_list_no_customer_post_404(self):
+    def test_offer_list_post_404(self):
         url = reverse("order-list")
         data = {"offer_detail_id": 999}
         response = self.client.post(url, data, format= "json")

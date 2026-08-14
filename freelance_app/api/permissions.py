@@ -57,24 +57,26 @@ class OfferPermission(BasePermission):
 class OrderPermission(BasePermission):
     def has_permission(self, request, view):
         is_authenticated = request.user.is_authenticated
+
         if request.method == "DELETE":
             return request.user.is_staff
+        
+        if request.method == "POST":    
+            is_type_customer  = self.check_type(request, "customer")
+            return is_type_customer
+        
         return is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        if request.method in ("POST"):    
-            is_type_business  = self.check_type(request)
-            return is_type_business
-
         if request.method in ("PATCH"):
             is_owner = self.check_owner(request, obj)
-            is_type_business  = self.check_type(request)
+            is_type_business  = self.check_type(request, "business")
             return is_owner and is_type_business
         return True
     
-    def check_type(self, request):
+    def check_type(self, request, typeValue):
         request_user = request.user
-        is_profile_business = Profile.objects.filter(username = request_user, type = "business").exists()
+        is_profile_business = Profile.objects.filter(username = request_user.username, type = typeValue).exists()
 
         return is_profile_business
 
@@ -89,18 +91,27 @@ class OrderPermission(BasePermission):
 class ReviewPermission(BasePermission):
     def has_permission(self, request, view):
         is_authenticated = request.user.is_authenticated
+        is_customer = self.check_customer(request)
+
+        if request.method in ("POST"):
+            return is_customer
         return is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        is_customer = self.check_customer(request, obj)
-        
-        if request.method in ("POST"):    
-            return is_customer
-        return True
+        if request.method in ("PATCH", "DELETE"):
+            is_reviewer = self.check_reviewer(request, obj)
+            return is_reviewer
     
-    def check_customer(self, request, profile):
+    def check_customer(self, request):
         request_user = request.user
         profile_user = get_object_or_404(Profile, username = request_user)
-        is_customer = profile.type == "customer"
+        is_customer = profile_user.type == "customer"
 
         return is_customer
+
+    def check_reviewer(self, request, review):
+        request_user = request.user
+        profile_user = get_object_or_404(Profile, username = request_user)
+        is_reviewer = review.reviewer == profile_user
+        
+        return is_reviewer

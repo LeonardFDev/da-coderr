@@ -56,20 +56,20 @@ class ReviewListGetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_review_list_filter_ordering_business_filter_get_200(self):
-            url = reverse("review-list")
-            filter_ordering = {"business_user_id": 5, "ordering": "rating"}
-            response = self.client.get(url, filter_ordering)
+        url = reverse("review-list")
+        filter_ordering = {"business_user_id": 5, "ordering": "rating"}
+        response = self.client.get(url, filter_ordering)
                 
-            status_code_with_message(self, response)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_review_list_filter_ordering_reviewer_filter_get_200(self):
-            url = reverse("review-list")
-            filter_ordering = {"reviewer_id": 1, "ordering": "updated_at"}
-            response = self.client.get(url, filter_ordering)
+        url = reverse("review-list")
+        filter_ordering = {"reviewer_id": 1, "ordering": "updated_at"}
+        response = self.client.get(url, filter_ordering)
                 
-            status_code_with_message(self, response)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_review_list_get_200(self):
         url = reverse("review-list")

@@ -65,7 +65,6 @@ class OfferListPostTests(APITestCase):
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
     def test_offer_list_no_values_post_400(self):
         url = reverse("offer-list")
         data = {}

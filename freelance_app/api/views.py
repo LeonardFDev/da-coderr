@@ -80,6 +80,7 @@ class OfferDetailsDetailView(generics.RetrieveAPIView):
 
 class OrderListView(generics.ListCreateAPIView):
     serializer_class = OrderListSerializer
+    permission_classes = [OrderPermission]
 
     def get_queryset(self):
         request_username = self.request.user.username
@@ -95,9 +96,6 @@ class OrderListView(generics.ListCreateAPIView):
         offer_detail_id = serializer.validated_data["offer_detail_id"]
 
         offer_detail = OfferDetail.objects.get(id=offer_detail_id)
-
-        if profile.type != "customer":
-            raise PermissionDenied("Only users with the type \"customer\" are allowed to add an order.")
 
         serializer.save(customer_user = profile, offer_detail = offer_detail, offer = offer_detail.offer)
 

@@ -101,7 +101,7 @@ class ProfilesBusinessTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        ProfileData.create_profile_customer_objects(User, Profile, 9)
+        ProfileData.create_profile_objects(User, Profile, 9)
 
     def test_business_list_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
@@ -137,7 +137,7 @@ class ProfilesCustomerTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        ProfileData.create_profile_customer_objects(User, Profile, 9)
+        ProfileData.create_profile_objects(User, Profile, 9)
 
     def test_customer_list_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")

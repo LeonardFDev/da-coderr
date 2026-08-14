@@ -1,8 +1,11 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Avg
 from rest_framework import generics, filters
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 
 from auth_app.models import Profile
@@ -10,7 +13,7 @@ from freelance_app.models import Offer, OfferDetail, Order, Review
 from .serializers import ProfileSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, \
     OfferCreateSerializer, OfferListSerializer, OfferDetailGetSerializer, OfferDetailsSerializer, \
     OfferDetailPatchSerializer, OrderListSerializer, OrderDetailSerializer, OrderCountSerializer, \
-    OrderCompletedCountSerializer, ReviewSerializer
+    OrderCompletedCountSerializer, ReviewSerializer, ReviewPatchSerializer
 from .permissions import ProfilePermission, OfferPermission, OrderPermission, ReviewPermission
 from .pagination import LargeResultsSetPagination
 from .filters import OfferFilter, ReviewFilter
@@ -122,7 +125,6 @@ class OrderCompletedCountView(generics.RetrieveAPIView):
 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
     permission_classes = [ReviewPermission]
     http_method_names = ["get", "post", "patch", "delete"]
 
@@ -132,7 +134,29 @@ class ReviewViewSet(ModelViewSet):
     ordering_fields = ["updated_at", "rating"]
     ordering = ["id"]
 
+    def get_serializer_class(self):
+        if self.request.method == "PATCH":
+            return ReviewPatchSerializer
+        return ReviewSerializer
+    
     def perform_create(self, serializer):
         request_username = self.request.user.username
         profile = get_object_or_404(Profile, username = request_username)
         serializer.save(reviewer=profile)
+
+class BaseInfoListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        review_count = Review.objects.count()
+        average_rating = Review.objects.aggregate(Avg("rating"))["rating__avg"]
+        average_rating = round(average_rating, 1)
+        business_profile_count = Profile.objects.filter(type = "business").count()
+        offer_count = Offer.objects.count()
+
+        return Response({
+            "review_count": review_count,
+            "average_rating": average_rating,
+            "business_profile_count": business_profile_count,
+            "offer_count": offer_count,
+        })

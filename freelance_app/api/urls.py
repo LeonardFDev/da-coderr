@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import ProfileDetailView, ProfilesBusinessListView, ProfilesCustomerListView,\
     OfferListView, OfferDetailView, OfferDetailsDetailView, OrderListView, OrderDetailView, \
-    OrderCountView, OrderCompletedCountView, ReviewViewSet
+    OrderCountView, OrderCompletedCountView, ReviewViewSet, BaseInfoListView
 
 
 router = routers.SimpleRouter()
@@ -24,5 +24,7 @@ urlpatterns = [
     path("completed-order-count/<int:business_user_id>/", OrderCompletedCountView.as_view(), name ="completed-order-count-detail"),
 
     path("", include(router.urls)),
+
+    path("base-info/", BaseInfoListView.as_view(), name ="base-info-list"),
 ]
 

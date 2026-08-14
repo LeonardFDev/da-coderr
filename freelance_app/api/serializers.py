@@ -289,17 +289,19 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ["id", "business_user", "reviewer", "rating", "description", "created_at", "updated_at"]
+        read_only_fields = ["id", "reviewer", "created_at", "updated_at"]
 
     def validate_business_user(self, business_user):
         request_username = self.context["request"].user.username
         reviewer = get_object_or_404(Profile, username = request_username)
 
-        if Review.objects.filter(
-            business_user=business_user,
-            reviewer=reviewer,
-        ).exists():
-            raise serializers.ValidationError(
-                "You have already rated this User."
-            )
-
+        if Review.objects.filter(business_user=business_user, reviewer=reviewer,).exists():
+            raise serializers.ValidationError("You have already rated this User.")
         return business_user
+
+
+class ReviewPatchSerializer(ReviewSerializer, serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "business_user", "reviewer", "rating", "description", "created_at", "updated_at"]
+        read_only_fields = ["id", "business_user", "reviewer", "created_at", "updated_at"]

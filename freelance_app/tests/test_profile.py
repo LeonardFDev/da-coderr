@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 from auth_app.models import Profile
 from tests.helpers import status_code_with_message
+from .datas import data_profile as ProfileData
 
 
 class ProfileGetTests(APITestCase):
@@ -54,13 +55,7 @@ class ProfilePatchTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
 
         url = reverse("profile-detail", kwargs={"pk": self.profile.id})
-        data = {"first_name": "Max",
-                "last_name": "Mustermann",
-                "location": "Berlin",
-                "tel": "987654321",
-                "description": "Updated business description",
-                "working_hours": "10-18",
-                "email": "new_email@business.de"}
+        data = ProfileData.test_profile_data
         response = self.client.patch(url, data, format= "json")
 
         status_code_with_message(self, response)
@@ -74,13 +69,7 @@ class ProfilePatchTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + token2.key)
         
         url = reverse("profile-detail", kwargs={"pk": self.profile.id})
-        data = {"first_name": "Max",
-                "last_name": "Mustermann",
-                "location": "Berlin",
-                "tel": "987654321",
-                "description": "Updated business description",
-                "working_hours": "10-18",
-                "email": "new_email@business.de"}
+        data = ProfileData.test_profile_data
         response = self.client.patch(url, data, format= "json")
     
         status_code_with_message(self, response)
@@ -88,13 +77,7 @@ class ProfilePatchTests(APITestCase):
 
     def test_profile_detail_patch_404(self):
         url = reverse("profile-detail", kwargs={"pk": 999})
-        data = {"first_name": "Max",
-                "last_name": "Mustermann",
-                "location": "Berlin",
-                "tel": "987654321",
-                "description": "Updated business description",
-                "working_hours": "10-18",
-                "email": "new_email@business.de"}
+        data = ProfileData.test_profile_data
         response = self.client.patch(url, data, format= "json")
     
         status_code_with_message(self, response)
@@ -102,13 +85,7 @@ class ProfilePatchTests(APITestCase):
 
     def test_profile_detail_patch_200(self):
         url = reverse("profile-detail", kwargs={"pk": self.profile.id})
-        data = {"first_name": "Max",
-                "last_name": "Mustermann",
-                "location": "Berlin",
-                "tel": "987654321",
-                "description": "Updated business description",
-                "working_hours": "10-18",
-                "email": "new_email@business.de"}
+        data = ProfileData.test_profile_data
         response = self.client.patch(url, data, format= "json")
         
         status_code_with_message(self, response)
@@ -124,12 +101,7 @@ class ProfilesBusinessTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        user2 = User.objects.create_user(username="testuser2", password="testpassword", email="testuser2@test.de")
-        profile2 = Profile.objects.create(user= user2, username= user2.username, email = user2.email, type = "customer")
-        user3 = User.objects.create_user(username="testuser3", password="testpassword", email="testuser3@test.de")
-        profile3 = Profile.objects.create(user= user3, username= user3.username, email = user3.email, type = "business")
-        user4 = User.objects.create_user(username="testuser4", password="testpassword", email="testuser4@test.de")
-        profile4 = Profile.objects.create(user= user4, username= user4.username, email = user4.email, type = "business")
+        ProfileData.create_profile_customer_objects(User, Profile, 9)
 
     def test_business_list_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")
@@ -165,12 +137,7 @@ class ProfilesCustomerTests(APITestCase):
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION= "Token " + self.token.key)
 
-        user2 = User.objects.create_user(username="testuser2", password="testpassword", email="testuser2@test.de")
-        profile2 = Profile.objects.create(user= user2, username= user2.username, email = user2.email, type = "customer")
-        user3 = User.objects.create_user(username="testuser3", password="testpassword", email="testuser3@test.de")
-        profile3 = Profile.objects.create(user= user3, username= user3.username, email = user3.email, type = "business")
-        user4 = User.objects.create_user(username="testuser4", password="testpassword", email="testuser4@test.de")
-        profile4 = Profile.objects.create(user= user4, username= user4.username, email = user4.email, type = "business")
+        ProfileData.create_profile_customer_objects(User, Profile, 9)
 
     def test_customer_list_get_401(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token invalidtoken")

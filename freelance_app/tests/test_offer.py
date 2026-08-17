@@ -31,6 +31,14 @@ class OfferListGetTests(APITestCase):
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_offer_list_with_ordering_get_200(self):
+        url = reverse("offer-list")
+        ordering = {"ordering": "min_price",}
+        response = self.client.get(url, ordering)
+            
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
 class OfferListPostTests(APITestCase):
     def setUp(self):

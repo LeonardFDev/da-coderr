@@ -1,4 +1,6 @@
+from django.db.models import Min
 import django_filters
+
 from freelance_app.models import Offer, Review
 
 
@@ -8,19 +10,21 @@ class OfferFilter(django_filters.FilterSet):
         lookup_expr="exact"
     )
 
-    min_price = django_filters.NumberFilter(
-        field_name="price",
-        lookup_expr="gte"
+    max_delivery_time = django_filters.NumberFilter(
+        field_name= "offer_details__delivery_time_in_days",
+        lookup_expr="lte"
     )
 
-    max_delivery_time = django_filters.NumberFilter(
-        field_name="delivery_time",
-        lookup_expr="lte"
+    min_price = django_filters.NumberFilter(
+        method="filter_min_price"
     )
 
     class Meta:
         model = Offer
-        fields = []
+        fields = ["creator_id", "max_delivery_time", "min_price"]
+
+    def filter_min_price(self, queryset, name, value):
+        return queryset.annotate(min_price=Min("offer_details__price")).filter(min_price__gte=value)
 
 
 class ReviewFilter(django_filters.FilterSet):

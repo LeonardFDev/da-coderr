@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Min
 from rest_framework import generics, filters
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -43,10 +43,18 @@ class OfferListView(generics.ListCreateAPIView):
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = OfferFilter
-    filterset_fields = ["creator_id", "min_price", "max_delivery_time"]
     search_fields = ["title", "description"]
     ordering_fields = ["updated_at", "min_price"]
     ordering = ["id"]
+
+    def get_queryset(self):
+        queryset = Offer.objects.all()
+
+        ordering = self.request.query_params.get("ordering", "")
+
+        if "min_price" in ordering:
+            queryset = Offer.objects.annotate(min_price=Min("offer_details__price"))
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -100,7 +108,7 @@ class OrderListView(generics.ListCreateAPIView):
 
         offer_detail = OfferDetail.objects.get(id=offer_detail_id)
 
-        serializer.save(customer_user = profile, offer_detail = offer_detail, offer = offer_detail.offer)
+        serializer.save(customer_user = profile, business_user = offer_detail.offer.user, offer_detail = offer_detail, offer = offer_detail.offer)
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):

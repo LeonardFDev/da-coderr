@@ -78,7 +78,29 @@ class OfferDetailsListPartPathSerializer(serializers.ModelSerializer):
         return url_without_api
 
 
-class OfferCreateSerializer(serializers.ModelSerializer):
+class OfferListSerializer(serializers.ModelSerializer):
+    details = OfferDetailsListPartPathSerializer(many=True, source="offer_details")
+    min_price = serializers.SerializerMethodField()
+    min_delivery_time = serializers.SerializerMethodField()
+    user_details = OfferUserDetails(source = "user")
+
+    class Meta:
+        model = Offer
+        fields = ["id", "user", "title", "image", "description", "created_at", "updated_at", "details", "min_price", "min_delivery_time", "user_details"]
+
+    def get_min_price(self, obj):
+        min_price = float(obj.offer_details.aggregate(min_price=Min("price"))["min_price"])
+
+        if min_price.is_integer():
+            return int(min_price)
+        else:
+            return min_price
+    
+    def get_min_delivery_time(self, obj):
+        return obj.offer_details.aggregate(min_delivery_time=Min("delivery_time_in_days"))["min_delivery_time"]
+
+
+class OfferCreateSerializer(OfferListSerializer, serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True, source="offer_details")
 
     class Meta:
@@ -95,12 +117,6 @@ class OfferCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("basic, standard and premium allowed to occur only once and must not appear multiple times.")
         return value
 
-    def get_min_price(self, obj):
-        return float(obj.offer_details.aggregate(min_price=Min("price"))["min_price"])
-
-    def get_min_delivery_time(self, obj):
-        return obj.offer_details.aggregate(min_delivery_time=Min("delivery_time_in_days"))["min_delivery_time"]
-
     def create(self, validated_data):
         offer_details_data = validated_data.pop("offer_details")
 
@@ -109,28 +125,6 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         for offer_detail_data in offer_details_data:
             OfferDetail.objects.create(offer=offer, **offer_detail_data)
         return offer
-
-
-class OfferListSerializer(serializers.ModelSerializer):
-    details = OfferDetailsListPartPathSerializer(many=True, source="offer_details")
-    min_price = serializers.SerializerMethodField()
-    min_delivery_time = serializers.SerializerMethodField()
-    user_details = OfferUserDetails(source = "user")
-
-    class Meta:
-        model = Offer
-        fields = ["id", "user", "title", "image", "description", "created_at", "updated_at", "details", "min_price", "min_delivery_time", "user_details"]
-
-    def get_min_price(self, obj):
-        price = float(obj.offer_details.aggregate(min_price=Min("price"))["min_price"])
-
-        if price.is_integer():
-            return int(price)
-        else:
-            return price
-    
-    def get_min_delivery_time(self, obj):
-        return obj.offer_details.aggregate(min_delivery_time=Min("delivery_time_in_days"))["min_delivery_time"]
 
 
 class OfferDetailGetSerializer(OfferListSerializer, serializers.ModelSerializer):
@@ -227,10 +221,7 @@ class OrderListSerializer(serializers.ModelSerializer):
             "offer_detail_id", "id", "customer_user", "business_user", "title", 
             "revisions", "delivery_time_in_days", "price", "features", "offer_type", 
             "status", "created_at", "updated_at"]
-        read_only_fields = [
-            "id", "customer_user", "business_user", "title", 
-            "revisions", "delivery_time_in_days", "price", "features", 
-            "offer_type", "created_at", "updated_at", "status"]
+        read_only_fields = ["id", "customer_user", "created_at", "updated_at", "status"]
 
     def validate_offer_detail_id(self, id):
         try:

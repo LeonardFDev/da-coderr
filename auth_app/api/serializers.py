@@ -47,6 +47,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             user = user,
             username = validated_data["username"],
             email = validated_data["email"],
+            type = validated_data["type"]
         )
 
         data = {

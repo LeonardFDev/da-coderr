@@ -6,7 +6,7 @@ from auth_app.models import Profile
 class Offer(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    image = models.CharField(max_length=100, blank=True, null=True)
+    image = models.ImageField(upload_to='offer/', blank=True, null=True)
     description = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

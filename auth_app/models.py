@@ -12,7 +12,7 @@ class Profile(models.Model):
     type = models.CharField(max_length=20, choices=Type.choices)
     first_name = models.CharField(max_length=100, blank=True, default="")
     last_name = models.CharField(max_length=100, blank=True, default="")
-    file = models.CharField(max_length=100, blank=True, default="")             # <- aktuell wird bei keiner Eingabe "" gesetzt, vielleicht wird das noch auf Null geändert
+    file = models.ImageField(upload_to='profile/', blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, default="")
     tel = models.CharField(max_length=20, blank=True, default="")
     description = models.TextField(blank=True, default="")

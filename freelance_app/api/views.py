@@ -150,8 +150,7 @@ class BaseInfoListView(APIView):
     def get(self, request):
         review_count = Review.objects.count()
         average_rating = Review.objects.aggregate(Avg("rating"))["rating__avg"]
-        if average_rating != None:
-            average_rating = round(average_rating, 1)
+        average_rating = self.check_average_rating_value(average_rating)
         business_profile_count = Profile.objects.filter(type = "business").count()
         offer_count = Offer.objects.count()
 
@@ -161,3 +160,9 @@ class BaseInfoListView(APIView):
             "business_profile_count": business_profile_count,
             "offer_count": offer_count,
         })
+
+    def check_average_rating_value(self, average_rating):
+        if average_rating != None:
+            return round(average_rating, 1)
+        else:
+            return "-"

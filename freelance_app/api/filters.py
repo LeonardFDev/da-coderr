@@ -11,8 +11,7 @@ class OfferFilter(django_filters.FilterSet):
     )
 
     max_delivery_time = django_filters.NumberFilter(
-        field_name= "offer_details__delivery_time_in_days",
-        lookup_expr="lte"
+        method="filter_max_delivery_time"
     )
 
     min_price = django_filters.NumberFilter(
@@ -23,6 +22,9 @@ class OfferFilter(django_filters.FilterSet):
         model = Offer
         fields = ["creator_id", "max_delivery_time", "min_price"]
 
+    def filter_max_delivery_time(self, queryset, name, value):
+        return queryset.annotate(max_delivery_time=Min("offer_details__delivery_time_in_days")).filter(max_delivery_time__lte=value)
+    
     def filter_min_price(self, queryset, name, value):
         return queryset.annotate(min_price=Min("offer_details__price")).filter(min_price__gte=value)
 

@@ -39,6 +39,22 @@ class OfferListGetTests(APITestCase):
         status_code_with_message(self, response)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_offer_list_with_min_price_filter_get_200(self):
+        url = reverse("offer-list")
+        filter = {"min_price": 50}
+        response = self.client.get(url, filter)
+                
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_offer_list_with_max_delivery_time_filter_get_200(self):
+        url = reverse("offer-list")
+        filter = {"max_delivery_time": 7}
+        response = self.client.get(url, filter)
+                
+        status_code_with_message(self, response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
 class OfferListPostTests(APITestCase):
     def setUp(self):

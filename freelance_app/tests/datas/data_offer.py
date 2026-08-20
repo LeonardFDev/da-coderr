@@ -1,3 +1,6 @@
+import random
+from decimal import Decimal
+
 test_offer_list_offer_type_double_value_post_400_data = {
     "title": "Grafikdesign-Paket",
     "image": None,
@@ -422,7 +425,6 @@ test_offer_detail_without_details_patch_200_data = {
 def create_offer_objects(profile_business, Offer, OfferDetail, range_stop = 12):
     for offer_number in range(1, range_stop):
         offer = Offer.objects.create(user= profile_business, title= f"Grafikdesign-Paket{offer_number}", image= None, description= f"Ein umfassendes Grafikdesign-Paket für Unternehmen{offer_number}.")
-        OfferDetail.objects.create(title= f"Basic Design{offer_number}", revisions= 2, delivery_time_in_days= 5, price= 100.99, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}"], offer_type= "basic", offer= offer)
-        OfferDetail.objects.create(title= f"Standard Design{offer_number}", revisions= 5, delivery_time_in_days= 7, price= 200, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}", f"Briefpapier{offer_number}"], offer_type= "standard", offer= offer)
-        OfferDetail.objects.create(title= f"Premium Design{offer_number}", revisions= 10, delivery_time_in_days= 10, price= 500, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}", f"Briefpapier{offer_number}", f"Flyer{offer_number}"], offer_type= "premium", offer= offer)
-        
+        OfferDetail.objects.create(title= f"Basic Design{offer_number}", revisions= random.randint(-1, 100), delivery_time_in_days= random.randint(3, 7), price= Decimal(random.randint(100, 25000)) / 100, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}"], offer_type= "basic", offer= offer)
+        OfferDetail.objects.create(title= f"Standard Design{offer_number}", revisions= random.randint(-1, 100), delivery_time_in_days= random.randint(8, 12), price= Decimal(random.randint(100, 25000)) / 100, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}", f"Briefpapier{offer_number}"], offer_type= "standard", offer= offer)
+        OfferDetail.objects.create(title= f"Premium Design{offer_number}", revisions= random.randint(-1, 100), delivery_time_in_days= random.randint(13, 17), price= Decimal(random.randint(100, 25000)) / 100, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}", f"Briefpapier{offer_number}", f"Flyer{offer_number}"], offer_type= "premium", offer= offer)

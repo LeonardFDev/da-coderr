@@ -11,6 +11,9 @@ class Offer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.title} ({self.id})"
+
 
 class OfferDetail(models.Model):
     class OfferType(models.TextChoices):
@@ -26,20 +29,26 @@ class OfferDetail(models.Model):
     offer_type = models.CharField(max_length=20, choices=OfferType.choices)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="offer_details")
 
+    def __str__(self):
+        return f"{self.title} ({self.id})"
+
 
 class Order(models.Model):
-   class Status(models.TextChoices):
+    class Status(models.TextChoices):
         CANCELLED = "cancelled", "Cancelled"
         IN_PROGRESS = "in_progress", "In Progress"
         COMPLETED = "completed" ,"Completed"
 
-   customer_user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="customer_user_orders")
-   business_user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="business_user_orders")
-   offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, related_name="offer_orders")
-   offer_detail = models.ForeignKey(OfferDetail, on_delete=models.SET_NULL, null=True, related_name="offer_detail_orders")
-   status = models.CharField(max_length=20, choices=Status.choices, default="in_progress")
-   created_at = models.DateTimeField(auto_now_add=True)
-   updated_at = models.DateTimeField(auto_now=True)
+    customer_user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="customer_user_orders")
+    business_user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="business_user_orders")
+    offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, related_name="offer_orders")
+    offer_detail = models.ForeignKey(OfferDetail, on_delete=models.SET_NULL, null=True, related_name="offer_detail_orders")
+    status = models.CharField(max_length=20, choices=Status.choices, default="in_progress")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.offer_detail.title} ({self.id})"
 
 
 class Review(models.Model):
@@ -57,3 +66,6 @@ class Review(models.Model):
                 name="unique_review_per_reviewer_business_user",
             )
         ]
+
+    def __str__(self):
+        return f"{self.reviewer.username} ({self.id})"

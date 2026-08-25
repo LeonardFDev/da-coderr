@@ -5,7 +5,8 @@ from django.core.management import call_command
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
-from .models import Profile, Offer, OfferDetail, Order, Review
+from freelance_app.models import Offer, OfferDetail, Order, Review
+from auth_app.models import Profile
 
 
 def generate_working_hours():
@@ -55,12 +56,18 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
 
 class UserFactory(factory.django.DjangoModelFactory):
+    @staticmethod
+    def fixed_or_random_password(password = None):
+        if password is None:
+            return factory.Faker("password")
+        return password
+
     username = factory.Faker("user_name")
-    password = factory.PostGenerationMethodCall("set_password", "asdasd")
-    # password = factory.PostGenerationMethodCall("set_password", factory.Faker("password"))
+    password = factory.PostGenerationMethodCall("set_password", fixed_or_random_password("asdasd"))
 
     _token = factory.RelatedFactory(TokenFactory, "user")
     _profile = factory.RelatedFactory(ProfileFactory,"user")
+
 
     class Meta:
         model = User
@@ -157,4 +164,3 @@ def create_all():
     OfferFactory.create_batch(15)
     OrderFactory.create_batch(30)
     create_review()
-    # from freelance_app.factories import create_all

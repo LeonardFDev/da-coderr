@@ -1,4 +1,4 @@
-# KanMind
+# Coderr
 
 [🇩🇪 Deutsche Version](README_DE.MD)
 

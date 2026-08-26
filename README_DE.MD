@@ -98,7 +98,7 @@ source venv/bin/activate
 
 ---
 
-## Sample Data
+## Beispieldaten
 
 Die Datenbank kann mit Beispieldaten über folgenden Befehl befüllt werden:
 
@@ -115,16 +115,6 @@ Die benötigten Python-Pakete installieren:
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-# Projektkonfiguration
-
-## Umgebungsvariablen
-
-Aktuell werden keine zusätzlichen Umgebungsvariablen benötigt.
-
-Die vorhandene `.env` Datei ist derzeit leer und enthält keine projektrelevanten Einstellungen.
 
 ---
 
@@ -153,7 +143,9 @@ SQLite wird verwendet, da das Projekt als Lernprojekt entwickelt wird und aktuel
 
 Die Datenbank wird lokal über folgende Datei verwaltet:
 
+```text
 db.sqlite3
+```
 
 ---
 
@@ -191,7 +183,7 @@ python manage.py createsuperuser
 
 Danach ist der Admin-Bereich erreichbar unter:
 
-```
+```text
 admin/
 ```
 
@@ -207,7 +199,7 @@ python manage.py runserver
 
 Standardmäßig ist die Anwendung erreichbar unter:
 
-```
+```text
 http://127.0.0.1:8000/
 ```
 
@@ -215,27 +207,37 @@ http://127.0.0.1:8000/
 
 # Authentifizierung
 
-Die API verwendet eine Token-basierte Authentifizierung.
+Die API verwendet eine token-basierte Authentifizierung über das Django REST Framework.
 
-Verwendetes Django REST Framework Modul:
+Verwendetes Modul:
 
-```
+```text
 rest_framework.authtoken
 ```
 
-Authentifizierung:
+Verwendete Authentifizierungsklasse:
 
-```
+```text
 rest_framework.authentication.TokenAuthentication
 ```
 
-Geschützte API-Anfragen müssen einen gültigen Token im Header senden.
+Token-Erstellung
+
+Bei der Registrierung eines neuen Benutzers wird automatisch ein Authentifizierungs-Token erstellt.
+
+Anmeldung
+
+Bei der Anmeldung wird der zum Benutzer gehörende Token abgerufen und zurückgegeben. Dieser Token wird anschließend für den Zugriff auf geschützte API-Endpunkte verwendet.
+
+Authentifizierte Anfragen
+
+Geschützte API-Anfragen müssen einen gültigen Token im Authorization-Header übermitteln.
 
 Beispiel:
 
 ```http
 Authorization: Token [USER_TOKEN]
-```
+``` 
 
 ---
 
@@ -273,7 +275,7 @@ Die Anwendung stellt folgende API-Endpunkte bereit:
 
 # Projektstruktur
 
-```
+```text
 Coderr
 │
 ├── .gitignore
@@ -341,40 +343,27 @@ Nur die Tests einer bestimmten Testdatei ausführen:
 
 ```bash
 python manage.py test auth_app.tests
-python manage.py test freelance_app.tests.test_base_info
-python manage.py test freelance_app.tests.test_offer
-python manage.py test freelance_app.tests.test_order
-python manage.py test freelance_app.tests.test_profile
-python manage.py test freelance_app.tests.test_review
 ```
 
----
+```bash
+python manage.py test freelance_app.tests.test_base_info
+```
 
-# Django Management Commands
+```bash
+python manage.py test freelance_app.tests.test_offer
+```
 
-Es wurden keine eigenen Django Management Commands implementiert.
+```bash
+python manage.py test freelance_app.tests.test_order
+```
 
----
+```bash
+python manage.py test freelance_app.tests.test_profile
+```
 
-# Deployment
-
-Aktuell ist kein produktives Deployment eingerichtet.
-
-Das Projekt befindet sich derzeit in einer lokalen Entwicklungsumgebung.
-
----
-
-# Sicherheitshinweise
-
-Das Projekt befindet sich aktuell in einer Entwicklungsumgebung und dient zu Lern- und Demonstrationszwecken.
-
-Bei einer Weiterentwicklung zu einer öffentlich betriebenen Anwendung müssten unter anderem folgende Punkte berücksichtigt werden:
-
-* sichere Verwaltung des `SECRET_KEY`
-* Konfiguration von `ALLOWED_HOSTS`
-* Aktivierung von HTTPS
-* Überprüfung der Datenbankwahl
-* sichere Verwaltung von Authentifizierungs-Tokens
+```bash
+python manage.py test freelance_app.tests.test_review
+```
 
 ---
 

@@ -4,7 +4,9 @@
 
 ## Description
 
-This project was developed as a learning project to gain practical experience in building a web application using Django and the Django REST Framework. The main focus is on implementing a backend with a REST API that enables communication between the backend and a provided frontend. The project covers, among other things, the handling of HTTP requests and the token-based authentication of protected endpoints using `rest_framework.authentication.TokenAuthentication`.
+This project was developed as a learning project to provide hands-on experience in developing a web application using Django and the Django REST Framework. The focus is on implementing a backend with a REST API through which a provided frontend communicates with the backend. Among other things, HTTP requests are processed, and protected endpoints are secured using token-based authentication.
+
+Furthermore, the API offers functions for filtering, searching, and sorting data. Pagination mechanisms are also used to provide large amounts of data clearly and efficiently via the API.
 
 ---
 
@@ -96,6 +98,16 @@ source venv/bin/activate
 
 ---
 
+## Sample Data
+
+You can populate the database with sample data using the following command:
+
+```bash
+python manage.py shell -c "from factories import create_all; create_all()"
+```
+
+---
+
 ## 3. Install dependencies
 
 Install the required Python packages:
@@ -103,16 +115,6 @@ Install the required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-# Project Configuration
-
-## Environment Variables
-
-No additional environment variables are currently required.
-
-The existing `.env` file is currently empty and does not contain any project-specific configuration.
 
 ---
 
@@ -141,7 +143,7 @@ SQLite is used because this project is intended as a learning project and curren
 
 The database is managed locally through the following file:
 
-```
+```text
 db.sqlite3
 ```
 
@@ -181,7 +183,7 @@ python manage.py createsuperuser
 
 The admin interface will then be available at:
 
-```
+```text
 admin/
 ```
 
@@ -197,7 +199,7 @@ python manage.py runserver
 
 By default, the application is available at:
 
-```
+```text
 http://127.0.0.1:8000/
 ```
 
@@ -209,13 +211,13 @@ The API uses token-based authentication.
 
 Django REST Framework module used:
 
-```
+```text
 rest_framework.authtoken
 ```
 
 Authentication method:
 
-```
+```text
 rest_framework.authentication.TokenAuthentication
 ```
 
@@ -263,7 +265,7 @@ The application provides the following API endpoints:
 
 # Project Structure
 
-```
+```text
 Coderr
 │
 ├── .gitignore
@@ -331,40 +333,27 @@ Run the tests from a specific test file:
 
 ```bash
 python manage.py test auth_app.tests
-python manage.py test freelance_app.tests.test_base_info
-python manage.py test freelance_app.tests.test_offer
-python manage.py test freelance_app.tests.test_order
-python manage.py test freelance_app.tests.test_profile
-python manage.py test freelance_app.tests.test_review
 ```
 
----
+```bash
+python manage.py test freelance_app.tests.test_base_info
+```
 
-# Django Management Commands
+```bash
+python manage.py test freelance_app.tests.test_offer
+```
 
-No custom Django management commands have been implemented.
+```bash
+python manage.py test freelance_app.tests.test_order
+```
 
----
+```bash
+python manage.py test freelance_app.tests.test_profile
+```
 
-# Deployment
-
-No production deployment has been configured.
-
-The project is currently running in a local development environment.
-
----
-
-# Security Notes
-
-This project is currently in a development environment and is intended for learning and demonstration purposes.
-
-If the project is further developed into a publicly accessible application, the following aspects should be considered:
-
-* Secure management of the `SECRET_KEY`
-* Proper configuration of `ALLOWED_HOSTS`
-* Enabling HTTPS
-* Reviewing the database choice
-* Secure handling of authentication tokens
+```bash
+python manage.py test freelance_app.tests.test_review
+```
 
 ---
 

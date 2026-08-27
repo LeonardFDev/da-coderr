@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission
 
 from auth_app.models import Profile
@@ -18,7 +17,7 @@ class ProfilePermission(BasePermission):
     
     def check_owner(self, request, profile):
         request_user = request.user
-        profile_user = get_object_or_404(Profile, username = request_user)
+        profile_user = Profile.objects.filter(username = request_user).first()
         is_owner = profile == profile_user
 
         return is_owner
@@ -26,10 +25,12 @@ class ProfilePermission(BasePermission):
 
 class OfferPermission(BasePermission):
     def has_permission(self, request, view):
-        if request.method in ("POST"):
-            is_authenticated = request.user.is_authenticated
-            return is_authenticated
-        return True
+        is_authenticated = request.user.is_authenticated
+
+        if request.method in ("GET") and not view.kwargs:
+            return True
+        
+        return is_authenticated
 
     def has_object_permission(self, request, view, obj):
         if request.method in ("POST"):    
@@ -49,7 +50,7 @@ class OfferPermission(BasePermission):
 
     def check_owner(self, request, obj):
         request_user = request.user
-        profile_user = get_object_or_404(Profile, username = request_user)
+        profile_user = Profile.objects.filter(username = request_user).first()
         is_owner = obj.user == profile_user
     
         return is_owner
@@ -82,7 +83,7 @@ class OrderPermission(BasePermission):
 
     def check_owner(self, request, obj):
         request_user = request.user
-        profile_user = get_object_or_404(Profile, username = request_user)
+        profile_user = Profile.objects.filter(username = request_user).first()
         is_owner = obj.business_user == profile_user
     
         return is_owner
@@ -93,25 +94,24 @@ class ReviewPermission(BasePermission):
         is_authenticated = request.user.is_authenticated
         is_customer = self.check_customer(request)
 
-        if request.method in ("POST"):
-            return is_customer
+        if view.action == "create":
+            return is_authenticated and is_customer 
         return is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        if request.method in ("PATCH", "DELETE"):
+        if view.action in ["partial_update", "destroy"]:
             is_reviewer = self.check_reviewer(request, obj)
             return is_reviewer
     
     def check_customer(self, request):
         request_user = request.user
-        profile_user = get_object_or_404(Profile, username = request_user)
-        is_customer = profile_user.type == "customer"
+        is_customer = Profile.objects.filter(username = request_user, type = "customer").first()
 
         return is_customer
 
     def check_reviewer(self, request, review):
         request_user = request.user
-        profile_user = get_object_or_404(Profile, username = request_user)
+        profile_user = Profile.objects.filter(username = request_user).first()
         is_reviewer = review.reviewer == profile_user
         
         return is_reviewer

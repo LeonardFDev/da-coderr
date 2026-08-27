@@ -209,9 +209,9 @@ class OrderListSerializer(serializers.ModelSerializer):
     offer_detail_id = serializers.IntegerField(write_only=True)
     business_user = serializers.PrimaryKeyRelatedField(source="offer_detail.offer.user", read_only=True)
     title = serializers.CharField(source="offer_detail.title", read_only=True)
-    revisions = serializers.CharField(source="offer_detail.revisions", read_only=True)
-    delivery_time_in_days = serializers.CharField(source="offer_detail.delivery_time_in_days", read_only=True)
-    price = serializers.CharField(source="offer_detail.price", read_only=True)
+    revisions = serializers.IntegerField(source="offer_detail.revisions", read_only=True)
+    delivery_time_in_days = serializers.IntegerField(source="offer_detail.delivery_time_in_days", read_only=True)
+    price = serializers.DecimalField(source="offer_detail.price", max_digits=10, decimal_places=2, coerce_to_string=False, read_only=True)
     features = serializers.JSONField(source="offer_detail.features", read_only=True)
     offer_type = serializers.CharField(source="offer_detail.offer_type", read_only=True)
     

@@ -10,6 +10,70 @@ Furthermore, the API offers functions for filtering, searching, and sorting data
 
 ---
 
+## Quickstart
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/LeonardFDev/da-coderr.git .
+```
+
+### 2. Create and activate a virtual environment
+
+#### Create: 
+```bash
+python -m venv env
+```
+#### Activate:
+
+Windows CMD:
+
+```bash
+"env/Scripts/activate" 
+```
+
+Windows PowerShell:
+
+```bash
+.\env\Scripts\Activate.ps1
+```
+
+Linux/macOS:
+
+```bash
+source ./env/bin/activate
+```
+
+### 3. Install requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Set up the database
+
+```bash
+python manage.py makemigrations
+```
+
+```bash
+python manage.py migrate
+```
+
+### 5. Create a superuser (optional)
+
+```bash
+python manage.py createsuperuser
+```
+
+### 6. Start the development server
+
+```bash
+python manage.py runserver
+```
+
+---
+
 # Features
 
 * REST API based on Django REST Framework
@@ -69,7 +133,7 @@ git clone [REPOSITORY_URL]
 Navigate to the project directory:
 
 ```bash
-cd [PROJECT_DIRECTORY]
+cd da-coderr
 ```
 
 ---

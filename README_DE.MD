@@ -10,6 +10,70 @@ Darüber hinaus bietet die API Funktionen zur Filterung, Suche und Sortierung vo
 
 ---
 
+## Quickstart
+
+### 1. Repository klonen
+
+```bash
+git clone https://github.com/LeonardFDev/da-coderr.git .
+```
+
+### 2. Virtuelle Umgebung erstellen und aktivieren 
+
+#### Erstellen: 
+```bash
+python -m venv env
+```
+#### Aktivieren:
+
+Windows CMD:
+
+```bash
+"env/Scripts/activate" 
+```
+
+Windows PowerShell:
+
+```bash
+.\env\Scripts\Activate.ps1
+```
+
+Linux/macOS:
+
+```bash
+source ./env/bin/activate
+```
+
+### 3. Abhängigkeiten installieren
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Datenbank vorbereiten
+
+```bash
+python manage.py makemigrations
+```
+
+```bash
+python manage.py migrate
+```
+
+### 5. Superuser erstellen (optional)
+
+```bash
+python manage.py createsuperuser
+```
+
+### 6. Entwicklungsserver starten
+
+```bash
+python manage.py runserver
+```
+
+---
+
 # Features
 
 * REST API auf Basis von Django REST Framework
@@ -63,13 +127,13 @@ Mögliche Betriebssysteme:
 Repository klonen:
 
 ```bash
-git clone [REPOSITORY_URL]
+git clone https://github.com/LeonardFDev/da-coderr.git
 ```
 
 In das Projektverzeichnis wechseln:
 
 ```bash
-cd [PROJECT_DIRECTORY]
+cd da-coderr
 ```
 
 ---

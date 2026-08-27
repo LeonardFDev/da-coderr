@@ -1,8 +1,14 @@
+"""Database models for the profile application."""
+
 from django.db import models
 from django.contrib.auth.models import User
 
 class Profile(models.Model):
+    """Represents a profile of the application."""
+
     class Type(models.TextChoices):
+        """Defines the possible types of a profile."""
+        
         BUSINESS = "business" ,"Business"
         CUSTOMER = "customer", "Customer"
     
@@ -24,9 +30,11 @@ class Profile(models.Model):
         ordering = ["id"]
     
     def __str__(self):
+        """Return the username and the id as a string."""
         return f"{self.username} ({self.id})"
 
     def delete(self, *args, **kwargs):
+        """Delete the profile and associated user."""
         user = self.user
         super().delete(*args, **kwargs)
         user.delete()

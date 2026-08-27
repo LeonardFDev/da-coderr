@@ -1,3 +1,5 @@
+"""URL configuration for the profiles, offers, offer detils, orders, review and base info API."""
+
 from django.urls import path, include
 from rest_framework import routers
 

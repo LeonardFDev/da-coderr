@@ -1,3 +1,5 @@
+"""Profiles, offers, offer detils, orders, review and base info API views."""
+
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg, Min
 from rest_framework import generics, filters
@@ -20,6 +22,8 @@ from .filters import OfferFilter, ReviewFilter
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
+    """Provides an API endpoint for retrieving and updating a profile."""
+
     queryset = Profile.objects.all()
     http_method_names = ["get", "patch"]
     serializer_class = ProfileSerializer
@@ -27,16 +31,22 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
 
 
 class ProfilesBusinessListView(generics.ListAPIView):
+    """Provides an API endpoint for listing profiles where the type is business."""
+    
     queryset = Profile.objects.filter(type = "business")
     serializer_class = ProfilesBusinessSerializer
 
 
 class ProfilesCustomerListView(generics.ListAPIView):
+    """Provides an API endpoint for listing profiles where the type is customer."""
+
     queryset = Profile.objects.filter(type = "customer")
     serializer_class = ProfilesCustomerSerializer
 
 
 class OfferListView(generics.ListCreateAPIView):
+    """Provides an API endpoint for listing and creating offers."""
+
     queryset = Offer.objects.all()
     permission_classes = [OfferPermission]
     pagination_class = LargeResultsSetPagination
@@ -48,6 +58,7 @@ class OfferListView(generics.ListCreateAPIView):
     ordering = ["id"]
 
     def get_queryset(self):
+        """Return offers ordered by 'id', 'updated_at' or 'min_price'."""
         queryset = Offer.objects.all()
 
         ordering = self.request.query_params.get("ordering", "")
@@ -57,11 +68,13 @@ class OfferListView(generics.ListCreateAPIView):
         return queryset
 
     def get_serializer_class(self):
+        """Return the appropriate serializer for the current request."""
         if self.request.method == "POST":
             return OfferCreateSerializer
         return OfferListSerializer
 
     def perform_create(self, serializer):
+        """Create a offer and hands over the logged in user."""
         request_username = self.request.user.username
         profile = get_object_or_404(Profile, username = request_username)
 
@@ -72,28 +85,36 @@ class OfferListView(generics.ListCreateAPIView):
 
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Provides an API endpoint for retrieving, updating, and deleting offer details."""
+
     queryset = Offer.objects.all()
     http_method_names = ["get", "patch", "delete"]
     permission_classes = [OfferPermission]
     lookup_field = "id"
 
     def get_serializer_class(self):
+        """Return the appropriate serializer for the current request."""
         if self.request.method == "GET":
             return OfferDetailGetSerializer
         return OfferDetailPatchSerializer
 
 
 class OfferDetailsDetailView(generics.RetrieveAPIView):
+    """Provides an API endpoint for retrieving an offer details."""
+
     queryset = OfferDetail.objects.all()
     serializer_class = OfferDetailsSerializer
     lookup_field = "id"
 
 
 class OrderListView(generics.ListCreateAPIView):
+    """Provides an API endpoint for listing and creating orders."""
+
     serializer_class = OrderListSerializer
     permission_classes = [OrderPermission]
 
     def get_queryset(self):
+        """Returns the orders associated with the logged-in user, either as a customer or as a business partner."""
         request_username = self.request.user.username
         profile = get_object_or_404(Profile, username = request_username)
 
@@ -102,6 +123,8 @@ class OrderListView(generics.ListCreateAPIView):
             .filter(Q(customer_user=profile.id) | Q(business_user=profile.id)))
 
     def perform_create(self, serializer):
+        """Create a order and hands over the logged in user.
+        In addition, the submitted ID is used to pass the business user, offer detail and offer"""
         request_username = self.request.user.username
         profile = get_object_or_404(Profile, username = request_username)
         offer_detail_id = serializer.validated_data["offer_detail_id"]
@@ -112,6 +135,8 @@ class OrderListView(generics.ListCreateAPIView):
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Provides an API endpoint for retrieving, updating, and deleting order."""
+
     queryset = Order.objects.all()
     serializer_class = OrderDetailSerializer
     http_method_names = ["patch", "delete"]
@@ -120,18 +145,24 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class OrderCountView(generics.RetrieveAPIView):
+    """Provides an endpoint returns the number of orders in progress from a given business user."""
+
     queryset = Profile.objects.all()
     serializer_class = OrderCountSerializer
     lookup_url_kwarg = "business_user_id"
 
 
 class OrderCompletedCountView(generics.RetrieveAPIView):
+    """Provides an endpoint returns the number of orders in completed from a given business user."""
+
     queryset = Profile.objects.all()
     serializer_class = OrderCompletedCountSerializer
     lookup_url_kwarg = "business_user_id"
 
 
 class ReviewViewSet(ModelViewSet):
+    """Provides API endpoints for managing reviews."""
+
     queryset = Review.objects.all()
     permission_classes = [ReviewPermission]
     http_method_names = ["get", "post", "patch", "delete"]
@@ -143,19 +174,24 @@ class ReviewViewSet(ModelViewSet):
     ordering = ["id"]
 
     def get_serializer_class(self):
+        """Return the appropriate serializer for the current action."""
         if self.request.method == "PATCH":
             return ReviewPatchSerializer
         return ReviewSerializer
     
     def perform_create(self, serializer):
+        """Create a review and hands over the logged in user."""
         request_username = self.request.user.username
         profile = get_object_or_404(Profile, username = request_username)
         serializer.save(reviewer=profile)
 
 class BaseInfoListView(APIView):
+    """Provides an API endpoint for retrieving base info"""
+
     permission_classes = [AllowAny]
 
     def get(self, request):
+        """Return a list with review count, average rating, business profile count and offer count."""
         review_count = Review.objects.count()
         average_rating = Review.objects.aggregate(Avg("rating"))["rating__avg"]
         average_rating = self.check_average_rating_value(average_rating)
@@ -170,6 +206,7 @@ class BaseInfoListView(APIView):
         })
 
     def check_average_rating_value(self, average_rating):
+        """Checks if there is a value and returns it rounded to one decimal place, if there is no value, a "-" is returned"""
         if average_rating != None:
             return round(average_rating, 1)
         else:

@@ -20,10 +20,12 @@ git clone https://github.com/LeonardFDev/da-coderr.git .
 
 ### 2. Create and activate a virtual environment
 
-#### Create: 
+#### Create:
+
 ```bash
 python -m venv env
 ```
+
 #### Activate:
 
 Windows CMD:

@@ -20,10 +20,12 @@ git clone https://github.com/LeonardFDev/da-coderr.git .
 
 ### 2. Virtuelle Umgebung erstellen und aktivieren 
 
-#### Erstellen: 
+#### Erstellen:
+
 ```bash
 python -m venv env
 ```
+
 #### Aktivieren:
 
 Windows CMD:

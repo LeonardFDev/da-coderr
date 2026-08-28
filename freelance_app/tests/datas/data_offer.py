@@ -1,3 +1,4 @@
+"""Data and helper function for the "Offer" test"""
 import random
 from decimal import Decimal
 
@@ -423,6 +424,7 @@ test_offer_detail_without_details_patch_200_data = {
 
 
 def create_offer_objects(profile_business, Offer, OfferDetail, range_stop = 12):
+    """Created Offer Objects"""
     for offer_number in range(1, range_stop):
         offer = Offer.objects.create(user= profile_business, title= f"Grafikdesign-Paket{offer_number}", image= None, description= f"Ein umfassendes Grafikdesign-Paket für Unternehmen{offer_number}.")
         OfferDetail.objects.create(title= f"Basic Design{offer_number}", revisions= random.randint(-1, 100), delivery_time_in_days= random.randint(3, 7), price= Decimal(random.randint(100, 25000)) / 100, features= [f"Logo Design{offer_number}", f"Visitenkarte{offer_number}"], offer_type= "basic", offer= offer)

@@ -1,3 +1,5 @@
+"""Data and helper function for the "Profile" test"""
+
 test_profile_data = {
     "first_name": "Max",
     "last_name": "Mustermann",
@@ -10,11 +12,13 @@ test_profile_data = {
 
 
 def create_profile_objects(User, Profile, range_stop = 12):
+    """Created Profile Objects"""
     for profile_number in range(1, range_stop):
         user = User.objects.create_user(username=f"testuser(p{profile_number})", password="testpassword", email=f"testuser(p{profile_number})@test.de")
         Profile.objects.create(user= user, username= user.username, email = user.email, type = type_changer(profile_number), first_name= "Test", last_name="name")
 
 def type_changer(profile_number):
+    """Switch between 'business' and 'customer' depending on whether the number is even or odd"""
     if profile_number % 2 == 0:
         return "business"
     else: 

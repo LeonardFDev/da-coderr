@@ -1,3 +1,5 @@
+"""Serializers for Profile, Offer, Offer Detail, Order and Review API operations."""
+
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.db.models import Min
@@ -347,7 +349,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class ReviewPatchSerializer(ReviewSerializer, serializers.ModelSerializer):
     """Serializer for updating Review instances via PATCH requests."""
-    
+
     class Meta:
         model = Review
         fields = ["id", "business_user", "reviewer", "rating", "description", "created_at", "updated_at"]

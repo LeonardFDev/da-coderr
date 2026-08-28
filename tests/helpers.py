@@ -1,4 +1,7 @@
+"""This is where helper functions are located"""
+
 def status_code_with_message(self, response):
+    """creates a test_protocol.log file whose contents show whether a test worked or not, similar to 'Postman'"""
     with open("test_protocol.log", "a", encoding="utf-8") as f:
         f.write("\n")
         f.write("-" * 160 + "\n")
@@ -9,6 +12,7 @@ def status_code_with_message(self, response):
         f.write("-" * 160 + "\n")
 
 def is_it_successful(self, response, f):
+    """checks whether the test could be processed, was a success or was a failure"""
     method_name_number = self._testMethodName.split("_")[-1]
     code = int(method_name_number) if method_name_number.isdecimal() else None
 

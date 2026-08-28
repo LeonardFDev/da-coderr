@@ -1,3 +1,5 @@
+"""Factories for creating sample data."""
+
 import factory
 import random
 from itertools import product

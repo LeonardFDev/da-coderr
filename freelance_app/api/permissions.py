@@ -1,3 +1,5 @@
+"""Permission classes for API access control for Profile, Offer, Order, and Review."""
+
 from rest_framework.permissions import BasePermission
 
 from auth_app.models import Profile
